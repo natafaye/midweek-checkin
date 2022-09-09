@@ -1,25 +1,28 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Routes, Route, Link } from 'react-router-dom';
-import ProductsPage from './pages/ProductsPage';
-import ShoppingCartPage from './pages/ShoppingCartPage';
+import React, { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import MessageList from './MessageList';
+import { TEST_MESSAGES, TEST_USERS } from './TEST_DATA';
+import UserListBar from './UserListBar';
 
 function App() {
-  const numberOfItems = useSelector(state => state.cart.entities.length)
+  const [userList, setUserList] = useState(TEST_USERS)
+  const [messageList, setMessageList] = useState(TEST_MESSAGES)
+
+  const addMessage = (newMessageText, receiverUserId) => {
+    const newMessage = {
+      id: messageList[messageList.length - 1].id + 1, // hack for getting the next unique id
+      text: newMessageText,
+      receiverUserId: receiverUserId
+    }
+
+    setMessageList( [...messageList, newMessage] )
+  }
 
   return (
     <div>
-      <nav className="navbar bg-dark navbar-dark">
-        <div className="container-fluid">
-          <Link to="/" className="navbar-brand">
-              Shopping Site
-          </Link>
-          <div className="float-right"><Link to="/cart" className="text-white">{ numberOfItems } items in cart</Link></div>
-        </div>
-      </nav>
+      <UserListBar userList={userList}/>
       <Routes>
-        <Route path="cart" element={<ShoppingCartPage/>} />
-        <Route path="/" element={<ProductsPage/>} />
+        <Route path="/messages/:receiverId" element={<MessageList messageList={messageList} onFormSubmit={addMessage}/>}/>
       </Routes>
     </div>
   );
